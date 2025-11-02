@@ -1,0 +1,78 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}Sent Requests{% endblock %}
+
+{% block content %}
+    <h1>Sent Requests</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Request</th>
+                <th>Pending To</th>
+                <th>PDF</th>
+                <th>Enclosures</th>
+                <th>Approval Flow</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in sent_requests %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ req.request_text }}</td>
+                <td>
+                    {% if req.current_approver %}
+                        {{ req.current_approver.name }}
+                    {% else %}
+                        Completed
+                    {% endif %}
+                </td>
+                <td>
+                    {% if req.form_files.all %}
+                        <a href="{{ req.form_files.first.file.url }}" target="_blank">View</a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if req.enclosure_files.all %}
+                        <a href="{{ req.enclosure_files.first.file.url }}" target="_blank">View</a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="view-details" onclick="toggleDetails('details-{{ req.request_id }}')">View</button>
+                </td>
+            </tr>
+            <tr class="details-row" id="details-{{ req.request_id }}" style="display:none;">
+                <td colspan="6">
+                    <div class="approval-details">
+                        {% for status in req.statuses.all %}
+                        <div class="step {{ status.status }}">
+                            {% if status.status == 'approved' %}
+                                &#x2714; {{ status.approver.name }} (Approved)
+                            {% elif status.status == 'pending' %}
+                                &#x23F3; {{ status.approver.name }} (Pending)
+                            {% elif status.status == 'rejected' %}
+                                &#x274C; {{ status.approver.name }} (Rejected)
+                            {% elif status.status == 'forwarded' %}
+                                &#x27A1; {{ status.approver.name }} (Forwarded)
+                            {% endif %}
+                        </div>
+                        {% if not forloop.last %}
+                        <div class="line"></div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No sent requests found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

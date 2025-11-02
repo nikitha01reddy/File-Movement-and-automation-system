@@ -1,0 +1,422 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+#main_login {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#login_frame {
+    width: 350px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+}
+ form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+ }
+h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+img{
+    height: auto;
+}
+#logo {
+    width: 250px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+#userid, #password {
+    width: 100%;
+    height: 40px;
+    margin: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+}
+
+#userid:focus, #password:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+#login{
+    background: linear-gradient(to right, #007bff, #0056b3);
+    width: 100%;
+}
+button {
+    background-color: rgba(3, 58, 198, 0.823); 
+}
+button:hover {
+    background: linear-gradient(to right, #0360c4, #003f8a);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+button:active {
+    background: linear-gradient(to right, #003f8a, #002b5e);
+}
+
+#login_frame h3 {
+    font-size: 18px;
+    font-weight: bold;
+    padding-bottom: 8px;
+    width: 100%;
+    text-align: center;
+    border-bottom: 2px solid #007bff;
+}
+
+
+@media (max-width: 400px) {
+    #login_frame {
+        width: 90%;
+        padding: 15px;
+    }
+
+    #userid, #password, #login {
+        height: 40px;
+        font-size: 14px;
+    }
+}
+
+input {
+    width: 100%;
+    height: 40px;
+    margin: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+button {
+    width: 6em;
+    height: 45px;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    margin:5px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Dashboard Page */
+.sidebar {
+    width: 250px;
+    background-color: #e8f4fd;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.main-content {
+    margin-left: 270px;
+    padding: 20px 50px;
+    text-align: left;
+}
+.main-content button{
+    width: 150px;
+}
+.status-cards {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    padding: 20px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    width: 150px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.received { background-color: #FF8C00; }
+.sent,.approved{ background-color: rgb(8, 165, 32); }
+.history { background-color: #6A0DAD; }
+.disapproved { background-color: #de1414; }
+.pending { background-color: #0ba3bb; }
+/* .create-btn {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+} */
+#dp{
+    width: 50%;
+}
+
+#menu a{
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    color: black;
+    border-radius: 5px;
+    background-color: #ffffff;
+    margin-bottom: 15px;
+    text-decoration: none;
+    justify-content: center;
+    
+}
+
+#menu a:hover {
+    background-color: #b9d5e9;}
+#profile p{
+    margin: 7px;
+}
+
+#profile{
+    padding: 10px;
+}
+/* Ensure model is centered and styled */
+#requestModel {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Model Content */
+.model-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 600px;
+    margin: 10% auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Close Button */
+.close-model {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Input and Select Fields */
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* File input */
+input[type="file"] {
+    border: none;
+}
+#addEnclosure, #submitRequest {
+    width: 12em; 
+    max-width: 300px; 
+    display: block;
+    margin: 10px auto; 
+    font-size: 15px;
+    height: auto;
+    padding: 7px;
+}
+/* Sent Requests Table */
+/* Approval Flow Box */
+.approval-details {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #eef5f9;
+    border-left: 5px solid #3498db;
+    border-radius: 5px;
+    padding-left: 20px;
+}
+
+/* Approval Steps */
+.step {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.approved {
+    color: rgb(255, 255, 255);
+    background-color: rgb(2, 193, 18);
+}
+
+.pending {
+    color: rgb(255, 255, 255);
+    background-color: #f18407e5;
+}
+
+/* Line Separators */
+.line {
+    width: 3px;
+    height: 20px;
+    background: gray;
+    margin-left: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    border: 1px solid #ddd;
+}
+td{
+    padding: 5px;
+}
+th {
+    background-color: #0056b3;
+    color: rgb(255, 255, 255);
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.status {
+
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.status.pending {
+    background-color: #FFC107;
+    color: black;
+}
+
+.status.approved {
+    background-color: #28A745;
+    color: white;
+}
+/* Model Styling */
+/* .model {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+} */
+
+.model-content {
+    background-color: white;
+    padding: 20px;
+    width: 70%;
+    /* margin: 10% auto; */
+    border-radius: 10px;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.model-actions button {
+    margin: 10px;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+}
+
+.model-actions button:first-child {
+    background-color: green;
+    color: white;
+}
+
+.model-actions button:nth-child(2) {
+    background-color: red;
+    color: white;
+}
+
+.model-actions button:last-child {
+    background-color: orange;
+    color: white;
+}
+
+.model {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the model vertically */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    background: rgba(0, 0, 0, 0.5); /* Dim background */
+}
+
+.model-content {
+    width: 50%; /* Half of the screen width */
+    max-height: 80vh; /* Ensure it does not take full height */
+    overflow-y: auto; /* Enable scrolling if needed */
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 10vh; /* Move the model down */
+}
+
+
+/* Two-column layout */
+.form-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-group {
+    width: 48%; /* Each input takes half of the form width */
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}

@@ -1,0 +1,130 @@
+<!-- templates/user/u_dashbd.html -->
+{% extends "user/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+    <button id="createRequestBtn" class="btn">+ REQUEST</button>
+    <br>
+    <button id="changePasswordBtn" class="btn">Change Password</button>
+    <div class="status-cards">
+        <a href="{% url 'requests:user_received' %}" class="card received">{{ received_count }} Received</a>
+        <a href="{% url 'requests:user_sent' %}" class="card sent">{{ sent_count }} Sent</a>
+        <a href="{% url 'requests:user_history' %}" class="card history">{{ history_count }} History</a>
+    </div>
+
+    <!-- Request Form Model -->
+    <div id="requestModel" class="model">
+        <div class="model-content">
+            <span class="close-model">&times;</span>
+            <h2 class="model-title">Submit Request</h2>
+
+            <form method="POST" action="{% url 'requests:submit_request' %}" enctype="multipart/form-data" class="form-container">
+                {% csrf_token %}
+
+                <!-- User Information -->
+                <label for="userName">User Name:</label>
+                <input type="text" id="userName" name="userName" value="{{ details.name }}" readonly>
+                <label for="userID">User ID:</label>
+                <input type="text" id="userID" name="userID" value="{{ userid }}" readonly>
+                
+                <!-- File Information -->
+                <label for="fileNo">File No.:</label>
+                <input type="text" id="fileNo" name="fileNo" placeholder="Enter File Number" required>
+                <label for="volumeNo">Volume No.:</label>
+                <input type="text" id="volumeNo" name="volumeNo" placeholder="Enter Volume Number" required>
+                
+                <!-- Security Classification -->
+                <label for="securityClassification">Security Classification:</label>
+                <select id="securityClassification" name="securityClassification" required>
+                    <option value="confidential">Confidential</option>
+                    <option value="restricted">Restricted</option>
+                    <option value="public">Public</option>
+                </select>
+
+                <!-- Select the recipient -->
+                <div class="form-row dual-listbox-container">
+                    <label for="sendTo" class="full-width" style="font-weight: bold; margin-top:20px;">Send To:</label>
+                    <div class="dual-listbox">
+                        <!-- Available Users -->
+                        <div class="listbox">
+                            <label for="availableUsers">Available Users:</label>
+                            <select id="availableUsers" size="8" multiple>
+                                {% for user in users %}
+                                <option value="{{ user.userid }}">{{ user.name }} ({{ user.userid }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Buttons to move users -->
+                        <div class="dual-listbox-buttons">
+                            <button type="button" id="addUser">&gt;</button>
+                            <button type="button" id="removeUser">&lt;</button>
+                        </div>
+
+                        <!-- Selected Users -->
+                        <div class="listbox">
+                            <label for="selectedUsers">Selected Users:</label>
+                            <select id="selectedUsers" name="sendTo" size="8" multiple required>
+                                <!-- Selected users will appear here -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Details -->
+                <label for="request">Request:</label>
+                <textarea id="request" name="request" placeholder="Enter your request..." required></textarea>
+                
+                <!-- Upload Form -->
+                <label for="uploadForm">Upload Form (PDF only):</label>
+                <input type="file" id="uploadForm" name="uploadForm" accept=".pdf" multiple>
+
+                <label for="enclosures">Upload Enclosures (PDF only):</label>
+                <input type="file" id="enclosures" name="enclosures" accept=".pdf" multiple>
+
+                <!-- Submit Button -->
+                <div class="form-row button-group">
+                    <button type="submit" class="btn-submit">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="changePasswordModal" class="model" style="display: none;">
+        <div class="model-content">
+          <span class="close-model" onclick="closePasswordModal()">&times;</span>
+          <h2 class="model-title">Change Password</h2>
+      
+          <form method="POST" action="{% url 'requests:change_password' %}">
+            {% csrf_token %}
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" required>
+      
+            <div class="form-row button-group">
+              <button type="submit" class="btn-submit">Save Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+      <script>
+        document.getElementById("changePasswordBtn").addEventListener("click", function () {
+          document.getElementById("changePasswordModal").style.display = "block";
+        });
+      
+        function closePasswordModal() {
+          document.getElementById("changePasswordModal").style.display = "none";
+        }
+      
+        // Optional: close modal when clicking outside it
+        window.onclick = function(event) {
+          const modal = document.getElementById("changePasswordModal");
+          if (event.target == modal) {
+            closePasswordModal();
+          }
+        }
+      </script>
+      
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'admin/a_dashbd.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Pending Requests</h2>
+
+{% if not pending_requests %}
+<div class="no-requests">No pending requests found.</div>
+{% else %}
+<div class="requests-table">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Sender</th>
+                <th>Request Text</th>
+                <th>Pending With</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in pending_requests %}
+            <tr class="main-row">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ req.user.name }}</td>
+                <td>{{ req.request_text|truncatechars:30 }}</td>
+                <td>{{ req.current_pending_with.name }}</td>
+                <td><button onclick="toggleDetails('details-{{ req.request_id }}')" class="btn">View</button></td>
+            </tr>
+            <tr class="details-row" id="details-{{ req.request_id }}" style="display:none;">
+                <td colspan="5">
+                    <div class="compact-details">
+                        <div class="detail-row">
+                            <span class="detail-label">File No:</span>
+                            <span class="detail-value">{{ req.file_no }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Volume No:</span>
+                            <span class="detail-value">{{ req.volume_no|default:"-" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Security Classification:</span>
+                            <span class="detail-value">{{ req.get_security_classification_display }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Description:</span>
+                            <span class="detail-value">{{ req.request_text|default:"N/A" }}</span>
+                        </div>
+
+                        <div class="section-title">Attached Files:</div>
+                        <div class="attachments">
+                            {% if req.form_files.exists or req.enclosure_files.exists %}
+                                {% if req.form_files.exists %}
+                                <div class="file-type">Form Files:</div>
+                                <ul>
+                                    {% for file in req.form_files.all %}
+                                    <li><a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"requests/forms/" }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                                {% if req.enclosure_files.exists %}
+                                <div class="file-type">Enclosure Files:</div>
+                                <ul>
+                                    {% for file in req.enclosure_files.all %}
+                                    <li><a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"requests/enclosures/" }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            {% else %}
+                                <div class="no-files">No files attached</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="section-title">Approval Flow:</div>
+                        <div class="approval-flow">
+                            {% for status in req.statuses.all|dictsort:"timestamp" %}
+                            <div class="flow-item">
+                                <span class="approver-name">{{ status.approver.name }}</span> -
+                                <span class="action">{{ status.get_status_display }}</span>
+                                <span class="date">({{ status.timestamp|date:"d M Y H:i" }})</span>
+                                {% if status.comment %}
+                                <div class="comment">Comment: {{ status.comment }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<style>
+    .detail-label {
+        font-weight: bold;
+        min-width: 150px;
+        display: inline-block;
+    }
+
+    .detail-value {
+        font-weight: normal;
+    }
+
+    .approver-name {
+        font-weight: bold;
+    }
+
+    .action {
+        font-weight: normal;
+    }
+
+    .date {
+        color: #666;
+        font-size: 0.9em;
+    }
+
+    .comment {
+        color: #555;
+        font-size: 0.9em;
+        margin-top: 3px;
+        padding-left: 10px;
+    }
+
+    .section-title {
+        font-weight: bold;
+        margin: 15px 0 8px 0;
+        padding-bottom: 3px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .file-type {
+        font-weight: bold;
+        margin-top: 8px;
+    }
+</style>
+{% endblock %}
+{% comment %} {% extends 'admin/a_dashbd.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Pending Requests</h2>
+
+{% if not pending_requests %}
+    <div class="no-requests">No pending requests found.</div>
+{% else %}
+    {% with requests=pending_requests status_column_header="Current Approver" %}
+        {% include 'admin/test.html' %}
+    {% endwith %}
+{% endif %}
+
+<style>
+.status.pending {
+    background-color: #FFC107;
+    color: black;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}
+
+{% block request_details %}
+    {% for req in pending_requests %}
+    <div class="detail-section">
+        <h4>Request Details</h4>
+        <div class="detail-grid">
+            <div>
+                <p><strong>File No:</strong> {{ req.file_no }}</p>
+                <p><strong>Volume No:</strong> {{ req.volume_no|default:"-" }}</p>
+            </div>
+            <div>
+                <p><strong>Classification:</strong> {{ req.get_security_classification_display }}</p>
+                <p><strong>Submitted On:</strong> {{ req.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+        </div>
+        <p><strong>Description:</strong></p>
+        <div class="description-box">{{ req.request_text }}</div>
+    </div>
+
+    <div class="detail-section">
+        <h4>Approval Flow</h4>
+        <div class="status-timeline">
+            {% for status in req.statuses.all|dictsort:"timestamp" %}
+            <div class="status-item {{ status.status }}">
+                <div class="status-header">
+                    <span class="status">{{ status.get_status_display }}</span>
+                    <span class="date">{{ status.timestamp|date:"M d, Y H:i" }}</span>
+                </div>
+                <p class="approver">By: {{ status.approver.name }}</p>
+                {% if status.comment %}<p class="comment">{{ status.comment }}</p>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %} {% endcomment %}

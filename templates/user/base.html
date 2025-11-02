@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Digital Approval{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/mini_pro.css' %}">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Select2 CSS & JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div id="profile">
+            <h2>Digital Approval</h2>
+            <img src="{% static 'images/userDP.png' %}" alt="User Profile Picture" id="dp">
+            <p>user name: {{ details.name }}</p>
+            <p>user id: {{ userid }}</p>
+        </div>
+        <div id="menu">
+            <a href="{% url 'requests:user_dashbd' %}" {% if request.resolver_match.url_name == 'user_dashbd' %}style="background-color: #b9d5e9;"{% endif %}>Dashboard</a>
+            <a href="{% url 'requests:user_received' %}" {% if request.resolver_match.url_name == 'user_received' %}style="background-color: #b9d5e9;"{% endif %}>Received</a>
+            <a href="{% url 'requests:user_sent' %}" {% if request.resolver_match.url_name == 'user_sent' %}style="background-color: #b9d5e9;"{% endif %}>Sent</a>
+            <a href="{% url 'requests:user_history' %}" {% if request.resolver_match.url_name == 'user_history' %}style="background-color: #b9d5e9;"{% endif %}>History</a>
+            <a href="{% url 'requests:logout' %}">Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        {% block content %}
+        <!-- Content from child templates will go here -->
+        {% endblock %}
+    </div>
+   
+    <script src="{% static 'js/mini_pro.js' %}"></script>
+</body>
+</html>

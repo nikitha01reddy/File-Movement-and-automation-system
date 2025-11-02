@@ -1,0 +1,111 @@
+{% extends "user/base.html" %}
+
+{% block title %}Received Requests{% endblock %}
+
+{% block content %}
+    {% if detail_view %}
+    {# DETAIL VIEW - When viewing a single request #}
+    <h2>Request Details</h2>
+    
+    <div class="request-details">
+        <p><strong>File No.:</strong> {{ request.file_no }}</p>
+        <p><strong>Volume No.:</strong> {{ request.volume_no|default:"N/A" }}</p>
+        <p><strong>Security Classification:</strong> {{ request.get_security_classification_display }}</p>
+        <p><strong>Request:</strong> {{ request.request_text }}</p>
+        <p><strong>Requested By:</strong> {{ request.user.name }}</p>
+        <p><strong>Created On:</strong> {{ request.created_at|date:"Y-m-d H:i" }}</p>
+    </div>
+    
+    <h3>Approval Flow</h3>
+    <div class="approval-flow">
+        {% for status in approval_flow %}
+        <div class="step {{ status.status }}">
+            <span class="icon">
+                {% if status.status == 'approved' %}✔️
+                {% elif status.status == 'rejected' %}✖️
+                {% else %}⏳{% endif %}
+            </span>
+            {{ status.approver.name }} ({{ status.get_status_display }}) - {{ status.timestamp|date:"Y-m-d H:i" }}
+            {% if status.comment %}<div class="comment">Comment: {{ status.comment }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <h3>Attachments</h3>
+    <div class="attachments">
+        <h4>Form Files:</h4>
+        <ul>
+            {% for file in form_files %}
+            <li><a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a></li>
+            {% empty %}
+            <li>No form files attached</li>
+            {% endfor %}
+        </ul>
+        
+        <h4>Enclosures:</h4>
+        <ul>
+            {% for file in enclosure_files %}
+            <li><a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a></li>
+            {% empty %}
+            <li>No enclosure files attached</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <form method="post" class="action-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="comment">Comments:</label>
+            <textarea id="comment" name="comment" rows="3"></textarea>
+        </div>
+        
+        <div class="action-buttons">
+            {% if not is_last_approver %}
+            <button type="submit" name="action" value="forward" class="btn-forward">Forward</button>
+            {% endif %}
+            
+            <button type="submit" name="action" value="reject" class="btn-reject">Reject</button>
+            
+            {% if is_last_approver %}
+            <button type="submit" name="action" value="approve" class="btn-approve">Approve</button>
+            {% endif %}
+        </div>
+    </form>
+
+    {% else %}
+    {# LIST VIEW - When viewing all received requests #}
+    <h2>Received Requests</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>File No.</th>
+                <th>Request</th>
+                <th>Requested By</th>
+                <th>Security</th>
+                <th>Created On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request_status in received_requests %}
+            <tr>
+                <td>{{ request_status.request.file_no }}</td>
+                <td>{{ request_status.request.request_text|truncatechars:50 }}</td>
+                <td>{{ request_status.request.user.name }}</td>
+                <td>{{ request_status.request.get_security_classification_display }}</td>
+                <td>{{ request_status.request.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'requests:handle_request_action' request_status.request.request_id %}" class="view-btn">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">No pending requests found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endblock %}
+
+

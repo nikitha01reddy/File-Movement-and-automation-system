@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Digital Approval{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/mini_pro.css' %}">
+    <script src="{% static 'js/mini_pro.js' %}"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div id="profile">
+            <h2>Digital Approval</h2>
+            <img src="{% static 'images/userDP.png' %}" alt="User Profile Picture" id="dp">
+            <p>Admin</p>
+        </div>
+        <div id="menu">
+            <a href="{% url 'requests:admin_dashbd' %}" {% if request.resolver_match.url_name == 'admin_dashbd' %}style="background-color: #b9d5e9;"{% endif %}>Dashboard</a>
+            <a href="{% url 'requests:approved_requests' %}" {% if request.resolver_match.url_name == 'approved_requests' %}style="background-color: #b9d5e9;"{% endif %}>Approved</a>
+            <a href="{% url 'requests:disapproved_requests' %}" {% if request.resolver_match.url_name == 'disapproved_requests' %}style="background-color: #b9d5e9;"{% endif %}>Disapproved</a>
+            <a href="{% url 'requests:pending_requests' %}" {% if request.resolver_match.url_name == 'pending_requests' %}style="background-color: #b9d5e9;"{% endif %}>Pending</a>
+            <a href="{% url 'requests:user_list' %}" {% if request.resolver_match.url_name == 'user_list' %}style="background-color: #b9d5e9;"{% endif %}>Users</a>
+            <a href="{% url 'requests:logout' %}">Logout</a>
+        </div>
+        </div>
+    </div> 
+    
+    <div class="main-content">
+        {% block content %}
+            <h1>Dashboard</h1>
+            <div class="status-cards">
+                <a href="{% url 'requests:approved_requests' %}" class="card approved">{{ total_approved }} Approved</a>
+                <div class="card disapproved">{{ total_rejected }} Disapproved</div>
+                <div class="card pending">{{ total_pending }} Pending</div>
+            </div>
+        </div>{% endblock %}
+    </div>
+</body>
+</html>

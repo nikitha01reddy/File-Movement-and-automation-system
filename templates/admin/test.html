@@ -1,0 +1,146 @@
+{% comment %} <!-- templates/admin/test.html -->
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Description</th>
+                <th>Date</th>
+                {% if show_status_column %}
+                <th>Status</th>
+                {% endif %}
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr class="main-row">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ req.user.name }}</td>
+                <td>{{ req.request_text|truncatechars:30 }}</td>
+                <td>{{ req.created_at|date:"M d, Y" }}</td>
+                {% if show_status_column %}
+                <td><span class="status {{ req.status }}">{{ req.get_status_display }}</span></td>
+                {% endif %}
+                <td>
+                    <button onclick="toggleDetails('details-{{ req.request_id }}')" class="btn">
+                        View
+                    </button>
+                </td>
+            </tr>
+            <tr class="details-row" id="details-{{ req.request_id }}" style="display:none;">
+                <td colspan="{% if show_status_column %}6{% else %}5{% endif %}">
+                    <div class="request-details-container">
+                        <div class="detail-section">
+                            <h4>Request Details</h4>
+                            <div class="detail-grid">
+                                <div>
+                                    <p><strong>File No:</strong> {{ req.file_no|default:"-" }}</p>
+                                    <p><strong>Volume No:</strong> {{ req.volume_no|default:"-" }}</p>
+                                </div>
+                                <div>
+                                    <p><strong>Classification:</strong> {{ req.get_security_classification_display }}</p>
+                                    <p><strong>Submitted:</strong> {{ req.created_at|date:"M d, Y H:i" }}</p>
+                                </div>
+                            </div>
+                            <p><strong>Full Description:</strong></p>
+                            <div class="description-box">{{ req.request_text }}</div>
+                        </div>
+
+                        {% block status_details %}{% endblock %}
+
+                        <div class="detail-section">
+                            <h4>Attachments</h4>
+                            <div class="attachments-grid">
+                                <div>
+                                    <h5>Form Files</h5>
+                                    {% if req.form_files.exists %}
+                                        <ul>
+                                            {% for file in req.form_files.all %}
+                                            <li class="file-attachment">
+                                                <span class="file-icon">📄</span>
+                                                <a href="{{ file.file.url }}" target="_blank">
+                                                    {{ file.file.name|cut:"requests/forms/" }}
+                                                </a>
+                                                <span class="file-size">({{ file.file.size|filesizeformat }})</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p>No form files uploaded</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h5>Enclosure Files</h5>
+                                    {% if req.enclosure_files.exists %}
+                                        <ul>
+                                            {% for file in req.enclosure_files.all %}
+                                            <li class="file-attachment">
+                                                <span class="file-icon">📎</span>
+                                                <a href="{{ file.file.url }}" target="_blank">
+                                                    {{ file.file.name|cut:"requests/enclosures/" }}
+                                                </a>
+                                                <span class="file-size">({{ file.file.size|filesizeformat }})</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p>No enclosure files uploaded</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div> {% endcomment %}
+
+<!-- templates/admin/test.html -->
+<!-- templates/admin/test.html -->
+<div class="requests-table">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Approved By</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr class="main-row">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ req.user.name }}</td>
+                <td>{{ req.request_text|truncatechars:30 }}</td>
+                <td>{{ req.created_at|date:"M d, Y" }}</td>
+                <td>
+                    {% if req.last_approver %}
+                        {{ req.last_approver.name }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <button onclick="toggleDetails('details-{{ req.request_id }}')" class="btn">
+                        View
+                    </button>
+                </td>
+            </tr>
+            <tr class="details-row" id="details-{{ req.request_id }}" style="display:none;">
+                <td colspan="6">
+                    <div class="request-details-container">
+                        {% block request_details %}{% endblock %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,204 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}User History{% endblock %}
+
+{% block content %}
+<h1>User History</h1>
+
+<section>
+    <h3>Requests Sent</h3>
+    <table border="1" class="request-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Request Text</th>
+                <th>Final Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if sent_requests %}
+                {% for request in sent_requests %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ request.request_text }}</td>
+                    <td class="status-{{ request.status|lower }}">{{ request.get_status_display }}</td>
+                    <td>
+                        <button class="view-details" data-target="sent-{{ request.request_id }}">View</button>
+                    </td>
+                </tr>
+                <tr id="sent-{{ request.request_id }}" class="details-row">
+                    <td colspan="4">
+                        <div class="request-details">
+                            <p><strong>File No:</strong> {{ request.file_no }}</p>
+                            <p><strong>Volume No:</strong> {{ request.volume_no|default:"N/A" }}</p>
+                            <p><strong>Security Classification:</strong> {{ request.get_security_classification_display }}</p>
+                            <p><strong>Description:</strong> {{ request.description|default:"N/A" }}</p>
+
+                            <div class="files-section">
+                                <h4>Attached Files:</h4>
+                                {% if request.form_files.all or request.enclosure_files.all %}
+                                    <ul class="file-list">
+                                        {% for file in request.form_files.all %}
+                                            <li><a href="{{ file.file.url }}" target="_blank">Form File {{ forloop.counter }}</a></li>
+                                        {% endfor %}
+                                        {% for file in request.enclosure_files.all %}
+                                            <li><a href="{{ file.file.url }}" target="_blank">Enclosure File {{ forloop.counter }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No files attached</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="approval-flow">
+                                <h4>Approval Flow:</h4>
+                                <ul class="status-list">
+                                    {% for status in request.statuses.all %}
+                                    <li>
+                                        <span class="approver">{{ status.approver.name }}</span> - 
+                                        <span class="status {{ status.status }}">{{ status.get_status_display }}</span>
+                                        ({{ status.timestamp|date:"d M Y H:i" }})
+                                        {% if status.comment %}<br><em>Comment: {{ status.comment }}</em>{% endif %}
+                                    </li>
+                                    {% if not forloop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            {% if request.status == 'rejected' and not request.resubmitted %}
+                            <div class="resubmit-section">
+                                <button onclick="location.href='{% url 'requests:resubmit_request' request.request_id %}'" 
+                                        class="resubmit-btn">
+                                    Resubmit with Additional Files
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="4">No sent requests in history.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h3>Requests Received</h3>
+    <table border="1" class="request-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Sender</th>
+                <th>Request Text</th>
+                <th>Your Action</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if received_requests %}
+                {% for req in received_requests %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ req.request.user.name }}</td>
+                    <td>{{ req.request.request_text }}</td>
+                    <td class="status-{{ req.status.status|lower }}">{{ req.status.get_status_display }}</td>
+                    <td>
+                        <button class="view-details" data-target="recv-{{ req.request.request_id }}">View</button>
+                    </td>
+                </tr>
+                <tr id="recv-{{ req.request.request_id }}" class="details-row">
+                    <td colspan="5">
+                        <div class="request-details">
+                            <p><strong>File No:</strong> {{ req.request.file_no }}</p>
+                            <p><strong>Volume No:</strong> {{ req.request.volume_no|default:"N/A" }}</p>
+                            <p><strong>Security Classification:</strong> {{ req.request.get_security_classification_display }}</p>
+                            <p><strong>Description:</strong> {{ req.request.description|default:"N/A" }}</p>
+
+                            <div class="files-section">
+                                <h4>Attached Files:</h4>
+                                {% if req.files %}
+                                    <ul class="file-list">
+                                        {% for file in req.files %}
+                                            <li><a href="{{ file.file.url }}" target="_blank">
+                                                {% if file in req.request.form_files.all %}
+                                                    Form File
+                                                {% else %}
+                                                    Enclosure File
+                                                {% endif %}
+                                                {{ forloop.counter }}
+                                            </a></li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No files attached</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="approval-flow">
+                                <h4>Approval Flow:</h4>
+                                <ul class="status-list">
+                                    {% for status in req.all_statuses %}
+                                    <li>
+                                        <span class="approver">{{ status.approver.name }}</span> - 
+                                        <span class="status {{ status.status }}">{{ status.get_status_display }}</span>
+                                        ({{ status.timestamp|date:"d M Y H:i" }})
+                                        {% if status.comment %}<br><em>Comment: {{ status.comment }}</em>{% endif %}
+                                    </li>
+                                    {% if not forloop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="your-action">
+                                <h4>Your Action Details:</h4>
+                                <p>
+                                    <strong>Action:</strong> {{ req.status.get_status_display }}<br>
+                                    <strong>Date:</strong> {{ req.status.timestamp|date:"d M Y H:i" }}<br>
+                                    <strong>Comment:</strong> {{ req.status.comment|default:"No comment provided" }}
+                                </p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="5">No received requests in history.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</section>
+
+
+ <script>
+
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", function() {
+    // Hide all details rows initially
+    document.querySelectorAll('.details-row').forEach(row => {
+        row.style.display = 'none';
+    });
+    
+    // Add click handlers for detail buttons
+    document.querySelectorAll('.view-details').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            toggleDetails(targetId);
+        });
+    });
+    
+    // Add click handler for resubmit buttons
+    document.querySelectorAll('.resubmit-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to resubmit this request?')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script> 
+
+{% endblock %}  
